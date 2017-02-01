@@ -3,11 +3,25 @@ package com.vladkanash;
 public class Main {
 
     public static void main(String[] args) {
-	    MyJobExecutor jobExecutor = new MyJobExecutor();
+        Runnable stoppingJob = () -> {
+            System.out.println("I am job number 4");
+            throw new ClassCastException();
+        };
+
+        Runnable simpleJob = () -> System.out.println("Simple job");
+
+	    JobExecutor jobExecutor = new MyJobExecutor();
+	    JobExecutor jobExecutor2 = new MyJobExecutor();
 
 	    jobExecutor.addJob(() -> System.out.println("I am job number 1"));
+        jobExecutor2.addJob(() -> System.out.println("I am job number 1"));
+
+
 	    jobExecutor.addJob(() -> System.out.println("I am job number 2"));
 	    jobExecutor.addJob(() -> System.out.println("I am job number 3"));
+
+        jobExecutor2.addJob(() -> System.out.println("I am job number 2"));
+        jobExecutor2.addJob(() -> System.out.println("I am job number 3"));
 	    jobExecutor.addJob(() -> {
 	        System.out.println("I am job number 4");
             try {
@@ -16,6 +30,7 @@ public class Main {
                 e.printStackTrace();
             }
         });
+	    jobExecutor.addJob(stoppingJob);
 
         jobExecutor.addJob(() -> System.out.println("I am job number 21"));
         jobExecutor.addJob(() -> System.out.println("I am job number 22"));
@@ -37,6 +52,11 @@ public class Main {
         jobExecutor.addJob(() -> System.out.println("I am job number 53"));
         jobExecutor.addJob(() -> System.out.println("I am job number 54"));
 
-	    jobExecutor.shutdown();
+        System.out.println(jobExecutor.getJobsCount());
+
+//	    jobExecutor.shutdown();
+        System.out.println("I am main thread");
+
+        jobExecutor.addJob(() -> System.out.println("I am job number 51"));
     }
 }

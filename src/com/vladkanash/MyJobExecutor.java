@@ -1,59 +1,78 @@
 package com.vladkanash;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Queue;
 
-class MyJobExecutor {
+class MyJobExecutor implements JobExecutor {
 
     private final Queue<Runnable> jobQueue = new ArrayDeque<>();
-    private final List<Thread> executionThreads = new ArrayList<>();
+    private final Thread executionThread = new Thread(new Worker());
 
-    void addJob(Runnable job) {
+    @Override
+    public void addJob(Runnable job) {
         synchronized (jobQueue) {
-            //run this job
             jobQueue.add(job);
-            jobQueue.notifyAll();
+            jobQueue.notify();
+        }
+
+        if (!executionThread.isAlive()) {
+            executionThread.start();
         }
     }
 
-    void shutdown() {
-        executionThreads.forEach(Thread::interrupt);
+    @Override
+    public int getJobsCount() {
+        synchronized (jobQueue) {
+            return jobQueue.size();
+        }
+    }
+
+    @Override
+    public void shutdown() {
+        executionThread.interrupt();
     }
 
     MyJobExecutor() {
-        for (int i = 0; i < 4; i++) {
-            Thread thread = new Thread(new ExecutionThread());
-            executionThreads.add(thread);
-            thread.start();
-        }
+//        executionThread.setDaemon(true);
     }
 
-    private class ExecutionThread implements Runnable {
+    private final class Worker implements Runnable {
+
+        private boolean running = true;
 
         @Override
         public void run() {
-            synchronized (jobQueue) {
-                Runnable job;
-                while (true) {
-                    job = jobQueue.poll();
-                    if (null != job) {
-                        System.out.print("Running thread #" + Thread.currentThread().getName());
-                        job.run();
-                    } else {
-
-                        try {
-                            jobQueue.wait();
-                        } catch (InterruptedException e) {
-                            System.out.println("I am interrupted!");
-                            return;
-                        }
-                    }
+            Runnable job;
+            while (running) {
+                synchronized (jobQueue) {
+                    job = getJob();
                 }
+                runJob(job);
             }
         }
 
+        private Runnable getJob() {
+            Runnable job = jobQueue.poll();
+            if (null == job) {
+                try {
+                    jobQueue.wait();
+                } catch (InterruptedException e) {
+                    running = false;
+                }
+            }
+            return job;
+        }
 
+        private void runJob(final Runnable job) {
+            if (null != job) {
+                try {
+                    job.run();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    ////
+                }
+            }
+        }
     }
+
 }
