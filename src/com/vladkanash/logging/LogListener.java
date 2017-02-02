@@ -31,12 +31,12 @@ public abstract class LogListener {
             return;
         }
         final String formattedMessage = formatter.format(message, level);
-        writeLog(formattedMessage);
+        writeLog(formattedMessage, level);
     }
 
     final Set<LogLevel> getLevels() {
         return levels;
     }
 
-    protected abstract void writeLog(final String message);
+    protected abstract void writeLog(final String message, final LogLevel level);
 }

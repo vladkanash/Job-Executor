@@ -24,7 +24,7 @@ public class FileLogListener extends LogListener {
     }
 
     @Override
-    protected void writeLog(final String message) {
+    protected void writeLog(final String message, final LogLevel level) {
         try {
             if (null == outputStream) {
                 outputStream = new OutputStreamWriter(new FileOutputStream(filePath, true));

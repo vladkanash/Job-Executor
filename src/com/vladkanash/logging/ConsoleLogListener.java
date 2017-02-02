@@ -6,7 +6,7 @@ package com.vladkanash.logging;
 public class ConsoleLogListener extends LogListener {
 
     @Override
-    protected void writeLog(final String message) {
+    protected void writeLog(final String message, final LogLevel level) {
         System.out.print(message);
     }
 }
