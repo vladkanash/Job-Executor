@@ -1,21 +1,27 @@
-package com.vladkanash;
+package com.vladkanash.executor;
+
+import com.vladkanash.logging.LogLevel;
+import com.vladkanash.logging.Logger;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
 
-class MyJobExecutor implements JobExecutor {
+public class MyJobExecutor implements JobExecutor {
 
     private final Queue<Runnable> jobQueue = new ArrayDeque<>();
-    private final Thread executionThread = new Thread(new Worker());
+    private final Logger logger = Logger.getInstance();
+    private Thread executionThread;
 
     @Override
-    public void addJob(Runnable job) {
+    public void execute(Runnable job) {
         synchronized (jobQueue) {
             jobQueue.add(job);
+            logger.log(LogLevel.INFO, "New job added, total jobs waiting for execution: " + jobQueue.size());
             jobQueue.notify();
         }
 
-        if (!executionThread.isAlive()) {
+        if (executionThread == null || !executionThread.isAlive()) {
+            executionThread = new Thread(new Worker());
             executionThread.start();
         }
     }
@@ -29,11 +35,9 @@ class MyJobExecutor implements JobExecutor {
 
     @Override
     public void shutdown() {
-        executionThread.interrupt();
-    }
-
-    MyJobExecutor() {
-//        executionThread.setDaemon(true);
+        if (null != executionThread && !executionThread.isInterrupted()) {
+            executionThread.interrupt();
+        }
     }
 
     private final class Worker implements Runnable {
@@ -45,13 +49,14 @@ class MyJobExecutor implements JobExecutor {
             Runnable job;
             while (running) {
                 synchronized (jobQueue) {
-                    job = getJob();
+                    job = getJobFromQueue();
                 }
+                logger.log(LogLevel.INFO, "Starting job execution..");
                 runJob(job);
             }
         }
 
-        private Runnable getJob() {
+        private Runnable getJobFromQueue() {
             Runnable job = jobQueue.poll();
             if (null == job) {
                 try {
@@ -64,13 +69,14 @@ class MyJobExecutor implements JobExecutor {
         }
 
         private void runJob(final Runnable job) {
-            if (null != job) {
-                try {
-                    job.run();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    ////
-                }
+            if (null == job) {
+                return;
+            }
+            try {
+                job.run();
+            } catch (Exception e) {
+                e.printStackTrace();
+                ////
             }
         }
     }
