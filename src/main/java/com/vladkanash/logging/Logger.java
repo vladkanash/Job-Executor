@@ -1,4 +1,4 @@
-package com.vladkanash.logging;
+package main.java.com.vladkanash.logging;
 
 import java.util.HashSet;
 import java.util.Set;

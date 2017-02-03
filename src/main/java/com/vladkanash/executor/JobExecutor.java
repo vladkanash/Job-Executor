@@ -1,4 +1,4 @@
-package com.vladkanash.executor;
+package main.java.com.vladkanash.executor;
 
 /**
  * Created by vladkanash on 2.2.17.
@@ -6,8 +6,6 @@ package com.vladkanash.executor;
 public interface JobExecutor {
 
     void execute(Runnable job);
-
-    int getJobsCount();
 
     void shutdown();
 }

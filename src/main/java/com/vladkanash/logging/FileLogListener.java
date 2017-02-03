@@ -1,4 +1,4 @@
-package com.vladkanash.logging;
+package main.java.com.vladkanash.logging;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;

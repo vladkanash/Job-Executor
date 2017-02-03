@@ -1,36 +1,23 @@
-package com.vladkanash.executor;
-
-import com.vladkanash.logging.LogLevel;
-import com.vladkanash.logging.Logger;
+package main.java.com.vladkanash.executor;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
 
-public class MyJobExecutor implements JobExecutor {
+public class SingleThreadJobExecutor implements JobExecutor {
 
     private final Queue<Runnable> jobQueue = new ArrayDeque<>();
-    private final Logger logger = Logger.getInstance();
-    private Thread executionThread;
+    private Thread executionThread = new Thread(new Worker());
 
     @Override
     public void execute(Runnable job) {
         synchronized (jobQueue) {
             jobQueue.add(job);
-            logger.log(LogLevel.INFO, "New job added, total jobs waiting for execution: " + jobQueue.size());
             jobQueue.notify();
-        }
-
-        if (executionThread == null || !executionThread.isAlive()) {
-            executionThread = new Thread(new Worker());
-            executionThread.start();
         }
     }
 
-    @Override
-    public int getJobsCount() {
-        synchronized (jobQueue) {
-            return jobQueue.size();
-        }
+    public SingleThreadJobExecutor() {
+        executionThread.start();
     }
 
     @Override
@@ -51,14 +38,13 @@ public class MyJobExecutor implements JobExecutor {
                 synchronized (jobQueue) {
                     job = getJobFromQueue();
                 }
-                logger.log(LogLevel.INFO, "Starting job execution..");
                 runJob(job);
             }
         }
 
         private Runnable getJobFromQueue() {
             Runnable job = jobQueue.poll();
-            if (null == job) {
+            if (job == null) {
                 try {
                     jobQueue.wait();
                 } catch (InterruptedException e) {
@@ -69,14 +55,13 @@ public class MyJobExecutor implements JobExecutor {
         }
 
         private void runJob(final Runnable job) {
-            if (null == job) {
+            if (job == null) {
                 return;
             }
             try {
                 job.run();
             } catch (Exception e) {
                 e.printStackTrace();
-                ////
             }
         }
     }

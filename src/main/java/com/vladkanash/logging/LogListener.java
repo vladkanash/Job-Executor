@@ -1,4 +1,7 @@
-package com.vladkanash.logging;
+package main.java.com.vladkanash.logging;
+
+import main.java.com.vladkanash.executor.JobExecutor;
+import main.java.com.vladkanash.executor.SingleThreadJobExecutor;
 
 import java.util.Collections;
 import java.util.EnumSet;
@@ -9,11 +12,14 @@ import java.util.Set;
  */
 public abstract class LogListener {
 
-    private Set<LogLevel> levels = EnumSet.of(LogLevel.INFO, LogLevel.ERROR);
+    private final Set<LogLevel> levels = EnumSet.of(LogLevel.INFO, LogLevel.ERROR);
     private MessageFormatter formatter = new DefaultMessageFormatter();
+    private final JobExecutor executor = new SingleThreadJobExecutor();
 
     public void setFormatter(final MessageFormatter formatter) {
-        this.formatter = formatter;
+        if (formatter != null) {
+            this.formatter = formatter;
+        }
     }
 
     public void setLogLevels(final LogLevel level, final LogLevel... levels) {
@@ -31,7 +37,7 @@ public abstract class LogListener {
             return;
         }
         final String formattedMessage = formatter.format(message, level);
-        writeLog(formattedMessage, level);
+        executor.execute(() -> writeLog(formattedMessage, level));
     }
 
     final Set<LogLevel> getLevels() {

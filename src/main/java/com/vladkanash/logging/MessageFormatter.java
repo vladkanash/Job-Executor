@@ -1,4 +1,4 @@
-package com.vladkanash.logging;
+package main.java.com.vladkanash.logging;
 
 /**
  * Created by User on 02.02.2017.

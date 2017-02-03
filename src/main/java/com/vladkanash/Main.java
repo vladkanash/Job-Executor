@@ -1,8 +1,9 @@
 package com.vladkanash;
 
-import com.vladkanash.executor.JobExecutor;
-import com.vladkanash.executor.MyJobExecutor;
+import main.java.com.vladkanash.executor.JobExecutor;
+import main.java.com.vladkanash.executor.SingleThreadJobExecutor;
 import com.vladkanash.logging.*;
+import main.java.com.vladkanash.logging.*;
 
 public class Main {
 
@@ -18,7 +19,11 @@ public class Main {
         FileLogListener executorLogListener = new FileLogListener("executor_log.txt");
 
         fileLogListener.setLogLevels(LogLevel.INFO, LogLevel.DEBUG, LogLevel.ERROR);
-        executorLogListener.setLogLevels(LogLevel.INFO);
+        executorLogListener.setLogLevels(
+                LogLevel.INFO,
+                LogLevel.ERROR,
+                LogLevel.DEBUG,
+                LogLevel.WARN);
 
         LogListener consoleListener = new ConsoleLogListener();
         consoleListener.setLogLevels(LogLevel.ERROR);
@@ -29,8 +34,8 @@ public class Main {
 
         Runnable simpleJob = () -> System.out.println("Simple job");
 
-	    final JobExecutor jobExecutor = new MyJobExecutor();
-	    final JobExecutor jobExecutor2 = new MyJobExecutor();
+	    final JobExecutor jobExecutor = new SingleThreadJobExecutor();
+	    final JobExecutor jobExecutor2 = new SingleThreadJobExecutor();
 
 	    logger.log(LogLevel.DEBUG, "Message 1");
 
@@ -67,29 +72,6 @@ public class Main {
 
         logger.log(LogLevel.ERROR, "message3");
         logger.log(LogLevel.ERROR, "Info message");
-
-        jobExecutor.execute(() -> System.out.println("I am job number 21"));
-        jobExecutor.execute(() -> System.out.println("I am job number 22"));
-        jobExecutor.execute(() -> System.out.println("I am job number 23"));
-        jobExecutor.execute(() -> System.out.println("I am job number 24"));
-
-        jobExecutor.execute(() -> System.out.println("I am job number 31"));
-        jobExecutor.execute(() -> System.out.println("I am job number 32"));
-        jobExecutor.execute(() -> System.out.println("I am job number 33"));
-        jobExecutor.execute(() -> System.out.println("I am job number 34"));
-
-        jobExecutor.execute(() -> System.out.println("I am job number 41"));
-        jobExecutor.execute(() -> System.out.println("I am job number 42"));
-        jobExecutor.execute(() -> System.out.println("I am job number 43"));
-        jobExecutor.execute(() -> System.out.println("I am job number 44"));
-
-        jobExecutor.execute(() -> System.out.println("I am job number 51"));
-        jobExecutor.execute(() -> System.out.println("I am job number 52"));
-        jobExecutor.execute(() -> System.out.println("I am job number 53"));
-        jobExecutor.execute(() -> System.out.println("I am job number 54"));
-
-        System.out.println(jobExecutor.getJobsCount());
-        System.out.println(jobExecutor2.getJobsCount());
 
 //	    jobExecutor.shutdown();
         System.out.println("I am main thread");

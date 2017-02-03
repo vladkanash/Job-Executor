@@ -1,4 +1,4 @@
-package com.vladkanash.logging;
+package main.java.com.vladkanash.logging;
 
 import java.util.Date;
 
@@ -7,7 +7,6 @@ import java.util.Date;
  */
 class DefaultMessageFormatter implements MessageFormatter {
 
-    @Override
     public String format(final String message, final LogLevel level) {
         return new StringBuilder()
                 .append(level)
