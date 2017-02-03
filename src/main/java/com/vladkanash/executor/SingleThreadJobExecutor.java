@@ -1,4 +1,4 @@
-package main.java.com.vladkanash.executor;
+package com.vladkanash.executor;
 
 import java.util.ArrayDeque;
 import java.util.Queue;

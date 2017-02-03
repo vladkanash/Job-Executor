@@ -1,4 +1,4 @@
-package main.java.com.vladkanash.logging;
+package com.vladkanash.logging;
 
 import java.util.Date;
 

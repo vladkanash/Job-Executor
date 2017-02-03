@@ -1,7 +1,7 @@
-package main.java.com.vladkanash.logging;
+package com.vladkanash.logging;
 
-import main.java.com.vladkanash.executor.JobExecutor;
-import main.java.com.vladkanash.executor.SingleThreadJobExecutor;
+import com.vladkanash.executor.JobExecutor;
+import com.vladkanash.executor.SingleThreadJobExecutor;
 
 import java.util.Collections;
 import java.util.EnumSet;

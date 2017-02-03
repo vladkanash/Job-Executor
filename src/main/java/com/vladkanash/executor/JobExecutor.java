@@ -1,4 +1,4 @@
-package main.java.com.vladkanash.executor;
+package com.vladkanash.executor;
 
 /**
  * Created by vladkanash on 2.2.17.
